@@ -1,0 +1,6 @@
+var server = getHostname();
+
+while (true)
+{
+	hack(server);
+}
