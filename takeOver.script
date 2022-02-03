@@ -1,0 +1,46 @@
+var server = args[0];
+var maxPorts = 0;
+tprintf("Taking over server: %s", server);
+
+
+if (getServerNumPortsRequired(server) > maxPorts) {
+	tprintf("Not taking over server %s. Not enough ports open", server);
+	exit();
+}
+
+var secLevel = getServerNumPortsRequired(server);
+switch (secLevel) {
+	case 0:
+		level0(server);
+		break;
+	case 1:
+		level1(server);
+		break;
+	case 2:
+		// level2(server);
+		break;
+	case 3:
+		break;
+}
+
+// brutessh(server);
+//	ftpcrack(server);
+//	relaysmtp(server);
+//	httpworm(server);
+//	sqlinject(server);
+
+
+function level0(server) {
+	nuke(server);
+}
+
+function level1(server) {
+	brutessh(server);
+	nuke(server);
+}
+function level2(server) {
+	brutessh(server);
+	ftpcrack(server);
+	nuke(server);
+
+}
