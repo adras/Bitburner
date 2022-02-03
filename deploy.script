@@ -1,0 +1,77 @@
+var servers = scan();
+var hackScript = "hack.script";
+var takeOverScript = "takeOver.script";
+var farm = "farm";
+// Forever
+
+// Scan for other servers
+for (var serverIdx = 0; serverIdx < servers.length; serverIdx++) {
+	var server = servers[serverIdx];
+	
+	if (server == "home")
+		continue;
+
+	if (server.startsWith(farm))
+		continue;
+
+	// Take them over
+	var isTakenOver = takeOverTarget(server);
+
+	// Run payload if it's mine
+	if (isTakenOver) {
+		tprintf("Executing payload");
+		executePayload(server);
+	}
+}
+
+
+function executePayload(server) {
+	scp(hackScript, "home", server);
+
+	// Don't kill all, kill only the hackScript, so that farm can keep running
+	while (kill(hackScript, server) != false);
+
+	var threads = getNumThreadsForScript(hackScript, server);
+	tprintf("Threads: " + threads);
+	if (threads == 0) {
+		tprintf("Skipping execution on server %s. Not enough ram", server);
+		return;
+	}
+
+	exec(hackScript, server, threads);
+
+}
+
+function getNumThreadsForScript(execScript, server) {
+	var reqRam = getScriptRam(execScript, server);
+
+	var maxRam = getServerMaxRam(server);
+	var usedRam = getServerUsedRam(server);
+	var freeRam = (maxRam - usedRam);
+	var threads = Math.floor(freeRam / reqRam);
+	// tprintf("RamCheck: Script: %s, req: %s, max: %s, used: %s, free: %s, threads: %s", execScript, reqRam, maxRam, usedRam, freeRam, threads);
+	return threads;
+}
+
+function takeOverTarget(server) {
+
+	var host = getHostname();
+
+	scp(takeOverScript, server);
+
+	if (!hasRootAccess(server)) {
+		var pid = exec(takeOverScript, host, 1, server);
+
+		// wait until take over script is finished
+		while (isRunning(pid, server));
+	}
+	else {
+		// tprintf("It's already mine");
+
+	}
+
+	var isTakenOver = hasRootAccess(server);
+	tprintf("Takeover %s success=%s", server, isTakenOver);
+
+	return isTakenOver;
+}
