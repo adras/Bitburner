@@ -1,6 +1,6 @@
 # Bitburner - Skynet
 ## Introduction
-This is my attempt at creating skynet for bitburner. The idea was to create a fully automated script which takes over all servers in the game, upgrades them where possible and farms money/hacking xp.
+This is my attempt at creating skynet for bitburner. The idea was to create a fully automated script which takes over all servers in the game, upgrades them where possible and farms money/hacking xp. Unfortunately I didn't finish it, and it's not as powerful as a real skynet. However, it already has some nice features.
 
 # Setup
 To set this up, create the files with the same names as here on github on your "home" computer in Bitburner
