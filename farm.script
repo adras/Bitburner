@@ -1,0 +1,45 @@
+var purchaseServerMinRam = 8;
+var serverName = "farm";
+var weakenScript = "weaken.script";
+do {
+	var currentServers = getPurchasedServers();
+	var maxServers = getPurchasedServerLimit();
+
+	if (currentServers.length == maxServers)
+		break;
+
+	var newCost = getPurchasedServerCost(purchaseServerMinRam);
+	var playerMoney = getServerMoneyAvailable("home");
+	// tprintf("Cost for new server: %s - Player money: %s", newCost, playerMoney);
+	if (newCost > playerMoney) {
+		continue;
+	}
+
+	var newServer = purchaseServer(serverName, purchaseServerMinRam);
+	tprintf("Bought new server: %s", newServer)
+	print("Bought new server: " + newServer);
+
+	scp(weakenScript, "home", newServer);
+	var threads = getNumThreadsForScript(weakenScript, newServer);
+	if (threads < 1)
+	{
+		tprintf("Not enough ram on new server o_O");
+		continue;
+	}
+	tprintf("Running weaken with %s threads", threads);
+	print("Executed weaken on " + newServer + " with " + threads + " threads");
+	exec(weakenScript, newServer, threads);
+} while (true);
+
+tprintf("Bought all servers possible");
+
+function getNumThreadsForScript(execScript, server) {
+	var reqRam = getScriptRam(execScript, server);
+
+	var maxRam = getServerMaxRam(server);
+	var usedRam = getServerUsedRam(server);
+	var freeRam = (maxRam - usedRam);
+	var threads = Math.floor(freeRam / reqRam);
+	//tprintf("RamCheck: Script: %s, req: %s, max: %s, used: %s, free: %s, threads: %s", execScript, reqRam, maxRam, usedRam, freeRam, threads);
+	return threads;
+}
