@@ -1,0 +1,42 @@
+var farmName = "farm";
+var home = "home";
+
+// Forever
+while (true) {
+	// Scan for other servers
+	var servers = scan(home);
+
+	// Use a random server to prevent multiple script hammering on the same server at once
+	var serverIdx = randomIntFromInterval(0, servers.length - 1);
+
+	var server = servers[serverIdx];
+	if (server == home)
+		continue;
+	if (server.startsWith(farmName))
+		continue;
+
+	var isTakenOver = hasRootAccess(server);
+
+	// Run payload if it's mine
+	if (isTakenOver) {
+		executeWeaken(server);
+		executeGrow(server);
+	}
+
+}
+
+function randomIntFromInterval(min, max) { // min and max included 
+	return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function executeWeaken(server) {
+	var minSec = getServerMinSecurityLevel(server);
+	var curSec = getServerSecurityLevel(server);
+	if (curSec > minSec + 1) {
+		weaken(server);
+	}
+}
+
+function executeGrow(server) {
+	grow(server);
+}
